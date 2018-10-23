@@ -4,29 +4,30 @@ if (typeof loaded === 'undefined') {
   const chalk = require('chalk')
   const util = require('util')
 
-  let err = console.error
-  let warn = console.warn
-  let log = console.log
+  const err  = console.error
+  const warn = console.warn
+  const log  = console.log
 
-  // If production env, date is important. If dev, time is enough
-  let formatFunc = process.env.NODE_ENV === 'production'
-                     ? ['toISOString']
-                     : ['toLocaleTimeString']
+  function printMsg (logFn, msg, color) {
 
-  console.error = (...msg) => {
-    let date = new Date()[formatFunc]().replace(/\s.*/, '')
-    err(chalk.red('[' + date + ']'), util.format.apply(this, msg))
+    // Since I'm Spanish, I find the Spanish formatting
+    // the most clear one
+    const now = new Date().toLocaleString('es')
+
+    // If production env, date is important. If dev, time is enough
+    const formattedDate = process.env.NODE_ENV === 'production'
+                            ? now.replace(/\/[0-9]{4}/, '')
+                            : now.replace(/.* /, '')
+    logFn(
+      chalk[color](`[${formattedDate}]`),
+      util.format.apply(this, msg)
+    )
   }
 
-  console.warn = (...msg) => {
-    let date = new Date()[formatFunc]().replace(/\s.*/, '')
-    warn(chalk.yellow('[' + date + ']'), util.format.apply(this, msg))
-  }
-
-  console.log = (...msg) => {
-    let date = new Date()[formatFunc]().replace(/\s.*/, '')
-    log(chalk.blue('[' + date + ']'), util.format.apply(this, msg))
-  }
+  console.log   = (...msg) => printMsg(log , msg, 'blue')
+  console.warn  = (...msg) => printMsg(warn, msg, 'yellow')
+  console.error = (...msg) => printMsg(err , msg, 'red')
 
   loaded = true
 }
+
