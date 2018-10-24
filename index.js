@@ -10,14 +10,14 @@ if (typeof loaded === 'undefined') {
 
   function printMsg (logFn, msg, color) {
 
-    // Since I'm Spanish, I find the Spanish formatting
-    // the most clear one
-    const now = new Date().toLocaleString('es')
+    const now = new Date()
+    const time = now.toTimeString().replace(/ .*/, '')
 
     // If production env, date is important. If dev, time is enough
     const formattedDate = process.env.NODE_ENV === 'production'
-                            ? now.replace(/\/[0-9]{4}/, '')
-                            : now.replace(/.* /, '')
+      ? `${now.getDate()}/${now.getMonth() + 1} ${time}`
+      : time
+
     logFn(
       chalk[color](`[${formattedDate}]`),
       util.format.apply(this, msg)
