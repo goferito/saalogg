@@ -1,6 +1,11 @@
 
+Object.assign(module.exports, {
+  addLogger,
+})
+
+
 // Avoid it to be loaded more than once
-if (typeof loaded === 'undefined') {
+if (console.__saalogg_loaded === undefined) {
   const chalk = require('chalk')
   const util = require('util')
 
@@ -28,6 +33,28 @@ if (typeof loaded === 'undefined') {
   console.warn  = (...msg) => printMsg(warn, msg, 'yellow')
   console.error = (...msg) => printMsg(err , msg, 'red')
 
-  loaded = true
+  console.__saalogg_loaded = true
+  console.__loggers = []
+}
+
+
+function addLogger ({ loggerId, logLevels, fn }) {
+
+  // Avoid adding the same logger twice
+  if (loggerId && console.__loggers.includes(loggerId)) {
+    console.warn("Attempt to add same logger twice\n", new Error().stack)
+    return
+  }
+  console.__loggers.push(loggerId)
+
+  logLevels.forEach((level) => {
+    if (!console[level]) throw new Error(`No valid log level ${level}`)
+
+    const tmp = console[level]
+    console[level] = (...msg) => {
+      tmp.apply(this, msg)
+      fn.apply(this, msg)
+    }
+  })
 }
 

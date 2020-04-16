@@ -1,6 +1,6 @@
 {
   "name": "saalogg",
-  "version": "0.2.1",
+  "version": "0.3.1",
   "description": "Just a simple logging tool",
   "main": "index.js",
   "scripts": {
